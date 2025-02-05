@@ -22,7 +22,7 @@ erDiagram
     
     TOKENS {
         UUID id PK
-        BOOLEAN available?
+        BOOLEAN available
     }
     
     TOKEN_ASSIGNMENTS {
