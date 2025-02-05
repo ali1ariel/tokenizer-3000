@@ -18,27 +18,33 @@ erDiagram
         UUID id PK
         STRING name
         STRING email
+        DATETIME created_at
+        DATETIME updated_at
     }
     
     TOKENS {
         UUID id PK
         BOOLEAN available
+        DATETIME created_at
+        DATETIME updated_at
     }
     
     TOKEN_ASSIGNMENTS {
         UUID id PK
         UUID token_id FK
         UUID user_id FK
-        DATETIME assigned_at
         DATETIME expires_at
+        DATETIME created_at
+        DATETIME updated_at
     }
     
     TOKEN_USAGE_HISTORY {
         UUID id PK
         UUID token_id FK
         UUID user_id FK
-        DATETIME expired_at
         ENUM expiration_reason
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     USERS ||--o{ TOKEN_ASSIGNMENTS : possui
