@@ -19,6 +19,22 @@ defmodule Tokenizer.Tokens.TokenAssignment do
     |> cast(attrs, [:token_id, :user_id, :expires_at])
     |> cast_assoc(:user)
     |> cast_assoc(:token)
+    |> put_expiration_date()
     |> validate_required([:token_id, :user_id])
+    |> foreign_key_constraint(:token_id)
+    |> foreign_key_constraint(:user_id)
+    |> unique_constraint(:token_id, name: :unique_active_token_assignment)
+    |> unique_constraint(:user_id, name: :unique_active_user_assignment)
+  end
+
+  defp put_expiration_date(changeset) do
+    changeset
+    |> put_change(:expires_at, define_expiration_time())
+  end
+
+  defp define_expiration_time() do
+    DateTime.utc_now()
+    |> Timex.shift(minutes: 2)
+    |> DateTime.truncate(:second)
   end
 end
