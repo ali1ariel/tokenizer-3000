@@ -5,13 +5,29 @@ defmodule Tokenizer.Queries.Token do
   import Ecto.Query
   alias Tokenizer.Tokens.Token
   alias Tokenizer.Tokens.TokenAssignment
+  alias Tokenizer.Tokens.TokenUsageHistory
+
+  @doc """
+    Lista todos os tokens ativos por meio do campo de disponibilidade do próprio token.
+  """
+  def list_active_tokens() do
+    from(t in Token)
+    |> where([t], t.available? == false)
+  end
+
+  @doc """
+    Lista todos os tokens disponíveis por meio do campo de disponibilidade do próprio token.
+  """
+  def list_available_tokens() do
+    from(t in Token)
+    |> where([t], t.available? == true)
+  end
 
   @doc """
     Busca um token disponível por meio do campo de disponibilidade do próprio token.
   """
   def search_available_token() do
-    from(t in Token)
-    |> where([t], t.available? == true)
+    list_available_tokens()
     |> limit(1)
   end
 
@@ -33,6 +49,7 @@ defmodule Tokenizer.Queries.Token do
   def get_token_assignment_by_token_id(token_id) do
     from(t in TokenAssignment)
     |> where([t], t.token_id == ^token_id)
+    |> preload([:token, :user])
   end
 
   @doc """
@@ -44,5 +61,27 @@ defmodule Tokenizer.Queries.Token do
       order_by: [asc: ta.inserted_at],
       limit: 1
     )
+  end
+
+  @doc """
+    Busca um token disponível por meio do campo de disponibilidade do próprio token.
+  """
+  def list_token_history(t_id) do
+    from(tus in TokenUsageHistory)
+    |> where([tus], tus.token_id == ^t_id)
+    |> preload([:token, :user])
+  end
+
+  def preload_user(query) do
+    query
+    |> preload(:user)
+  end
+
+  def preload_token(query) do
+    query
+    |> preload(:token)
+  end
+
+  def set_all_tokens_available() do
   end
 end

@@ -1,4 +1,4 @@
-defmodule Tokenizer.AssignmentRules do
+defmodule Tokenizer.TokenManager do
   @moduledoc """
     Concentra todas as regras de gerenciamento dos tokens, como a atribuição e liberação de tokens.
 
@@ -8,10 +8,10 @@ defmodule Tokenizer.AssignmentRules do
     - Libera o token para utilização
   """
 
-  alias Tokenizer.Tokens.TokenAssignment
+  alias Ecto.NoResultsError
   alias Tokenizer.Tokens
   alias Tokenizer.Tokens.Token
-  alias Tokenizer.Queries.Token, as: TokenQuery
+  alias Tokenizer.Queries.Token, as: TokenQueries
   alias Tokenizer.Users
   alias Tokenizer.Repo
 
@@ -19,9 +19,8 @@ defmodule Tokenizer.AssignmentRules do
     Busca um token disponível para uso, retorna o primeiro que estiver com o status de disponível.
   """
   def get_available_token() do
-    TokenQuery.search_available_token()
-    |> Repo.all()
-    |> then(fn [token] -> token end)
+    TokenQueries.search_available_token()
+    |> Repo.one()
   end
 
   @doc """
@@ -32,35 +31,64 @@ defmodule Tokenizer.AssignmentRules do
     user = Users.get_user!(user_id)
 
     with {:ok, token_assignment} <-
-           IO.inspect(Tokens.create_token_assignment(%{token_id: token.id, user_id: user.id}),
-             label: "assignment"
-           ) do
-      set_token_unavailable(token)
-      |> IO.inspect(label: "token unavailable")
+           Tokens.create_token_assignment(%{token_id: token.id, user_id: user.id}) do
+      set_token_active(token)
 
-      {:ok, token_assignment}
+      {:ok, token_assignment |> Repo.preload([:user, :token])}
     end
+  rescue
+    _ in NoResultsError -> {:error, :not_found}
+    _ -> {:error, :not_available}
   end
 
   @doc """
     Libera o token para reutilização, primeiro salva o histórico de uso, muda a disponibilidade no token e por fim exclui a associação com o usuário na tabela TokenAssignment.
   """
-  def release_token(%Token{} = token) do
+  def release_token(%Token{} = token, reason \\ :expired) do
     [token_assignment] =
-      TokenQuery.get_token_assignment_by_token_id(token.id)
+      TokenQueries.get_token_assignment_by_token_id(token.id)
       |> Repo.all()
 
     with {:ok, _} <-
            Tokens.create_token_usage_history(%{
              token_id: token_assignment.token_id,
-             user_id: token_assignment.user_id
+             user_id: token_assignment.user_id,
+             expiration_reason: reason
            }) do
       set_token_available(token)
       Tokens.delete_token_assignment(token_assignment)
     end
+  rescue
+    _m in MatchError ->
+      {:error, :not_found}
   end
 
-  defp set_token_unavailable(%Token{} = token) do
+  def list_token_history(token_id) do
+    token = Tokens.get_token!(token_id)
+
+    history =
+      TokenQueries.list_token_history(token_id)
+      |> Repo.all()
+
+    current_state =
+      TokenQueries.get_token_assignment_by_token_id(token_id)
+      |> Repo.one()
+
+    %{token: token, history: history, current_state: current_state}
+  rescue
+    _ in NoResultsError -> {:error, :not_found}
+    _ -> {:error, :not_available}
+  end
+
+  def set_all_tokens_available() do
+    TokenQueries.list_active_tokens()
+    |> Repo.all()
+    |> IO.inspect(label: "all")
+    |> Stream.map(fn t -> release_token(t, :removed) end)
+    |> Stream.run()
+  end
+
+  defp set_token_active(%Token{} = token) do
     token
     |> Tokens.update_token(%{available?: false})
   end

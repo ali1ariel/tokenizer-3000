@@ -5,8 +5,7 @@ defmodule Tokenizer.Tokens.TokenUsageHistory do
   alias Tokenizer.Users.User
 
   schema "tokens_usage_history" do
-    field :expiration_reason, Ecto.Enum, values: [expired: 1, replaced: 2], default: :expired
-
+    field :expiration_reason, Ecto.Enum, values: [expired: 1, replaced: 2, removed: 3]
     belongs_to :token, Token, type: :binary_id
     belongs_to :user, User
 
