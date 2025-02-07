@@ -15,7 +15,8 @@ defmodule Tokenizer.Application do
       # Start a worker by calling: Tokenizer.Worker.start_link(arg)
       # {Tokenizer.Worker, arg},
       # Start to serve requests, typically the last entry
-      TokenizerWeb.Endpoint
+      TokenizerWeb.Endpoint,
+      Tokenizer.ExpirationWorker
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -23,10 +23,16 @@ defmodule Tokenizer.TokenManager do
     |> Repo.one()
   end
 
+  def list_expired_assignments() do
+    Timex.now()
+    |> TokenQueries.list_expired_assignments()
+    |> Repo.all()
+  end
+
   @doc """
     Atribui um token à um usuário, criando um relacionamento por meio da tabela TokenAssignment, e setando o campo de disponibilidade no token.
   """
-  def assign_token(%{user_id: user_id}) do
+  def assign_token(%{id: user_id}) do
     token = get_available_token()
     user = Users.get_user!(user_id)
 

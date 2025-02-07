@@ -82,6 +82,9 @@ defmodule Tokenizer.Queries.Token do
     |> preload(:token)
   end
 
-  def set_all_tokens_available() do
+  def list_expired_assignments(now) do
+    from ta in TokenAssignment,
+      where: ta.expires_at <= ^now,
+      preload: [:token, :user]
   end
 end
