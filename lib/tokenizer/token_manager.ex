@@ -34,6 +34,12 @@ defmodule Tokenizer.TokenManager do
            Tokens.create_token_assignment(%{token_id: token.id, user_id: user.id}) do
       set_token_active(token)
 
+      Process.send_after(
+        Tokenizer.ExpirationWorker,
+        {:expire_token, token.id},
+        :timer.seconds(10)
+      )
+
       {:ok, token_assignment |> Repo.preload([:user, :token])}
     end
   rescue

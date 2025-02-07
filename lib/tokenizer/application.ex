@@ -2,7 +2,6 @@ defmodule Tokenizer.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
-
   use Application
 
   @impl true
@@ -15,7 +14,8 @@ defmodule Tokenizer.Application do
       # Start a worker by calling: Tokenizer.Worker.start_link(arg)
       # {Tokenizer.Worker, arg},
       # Start to serve requests, typically the last entry
-      TokenizerWeb.Endpoint
+      TokenizerWeb.Endpoint,
+      Tokenizer.ExpirationWorker
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
