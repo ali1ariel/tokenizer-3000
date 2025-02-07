@@ -38,7 +38,7 @@ defmodule TokenizerWeb.TokenController do
   Vincula um token a um usuário fornecido.
   """
   def use_token(conn, %{"user_id" => user_id}) do
-    case TokenManager.assign_token(%{user_id: user_id}) do
+    case TokenManager.assign_token(%{id: user_id}) do
       {:ok, token} ->
         conn
         |> render(:use_token, token_assignment: token)
