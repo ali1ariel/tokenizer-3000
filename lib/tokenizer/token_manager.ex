@@ -37,7 +37,7 @@ defmodule Tokenizer.TokenManager do
       Process.send_after(
         Tokenizer.ExpirationWorker,
         {:expire_token, token.id},
-        :timer.seconds(10)
+        :timer.minutes(2)
       )
 
       {:ok, token_assignment |> Repo.preload([:user, :token])}
