@@ -7,6 +7,14 @@ defmodule TokenizerWeb.Router do
 
   scope "/api", TokenizerWeb do
     pipe_through :api
+
+    resources "/users", UserController, except: [:new, :edit]
+
+    get "/tokens", TokenController, :index
+    get "/tokens/:id", TokenController, :show
+    get "/tokens/:id/history", TokenController, :history
+    post "/tokens/use", TokenController, :use_token
+    delete "/tokens/active", TokenController, :clear_active
   end
 
   # Enable LiveDashboard in development
