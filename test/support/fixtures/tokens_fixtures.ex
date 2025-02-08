@@ -36,7 +36,7 @@ defmodule Tokenizer.TokensFixtures do
         token_fixture()
 
     {:ok, token_assignment} =
-      attrs
+      %{}
       |> Enum.into(%{
         token_id: token.id,
         user_id: user.id,
@@ -68,7 +68,7 @@ defmodule Tokenizer.TokensFixtures do
         token_fixture()
 
     {:ok, token_usage_history} =
-      attrs
+      %{}
       |> Enum.into(%{
         token_id: token.id,
         user_id: user.id,

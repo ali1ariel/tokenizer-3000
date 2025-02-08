@@ -27,11 +27,16 @@ defmodule TokenizerWeb.TokenController do
   Busca todo o histórico de uso de um token no sistema, e seus usuários que já foram vinculados à ele.
   """
   def history(conn, %{"id" => id}) do
-    history =
-      TokenManager.list_token_history(id)
+    case TokenManager.list_token_history(id) do
+      {:error, :not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Dados não encontrados"})
 
-    conn
-    |> render(:history, history_data: history)
+      history ->
+        conn
+        |> render(:history, history_data: history)
+    end
   end
 
   @doc """
