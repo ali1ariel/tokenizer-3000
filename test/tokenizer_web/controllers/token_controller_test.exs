@@ -1,7 +1,7 @@
 defmodule TokenizerWeb.TokenControllerTest do
   use TokenizerWeb.ConnCase
 
-  alias Tokenizer.{Tokens, Users}
+  alias Tokenizer.Tokens
   import Tokenizer.TokensFixtures
   import Tokenizer.UsersFixtures
 

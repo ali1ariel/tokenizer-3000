@@ -72,16 +72,6 @@ defmodule Tokenizer.Queries.Token do
     |> preload([:token, :user])
   end
 
-  def preload_user(query) do
-    query
-    |> preload(:user)
-  end
-
-  def preload_token(query) do
-    query
-    |> preload(:token)
-  end
-
   def find_token_by_pokemon_name(pokemon) do
     Token
     |> where(name: ^pokemon)
