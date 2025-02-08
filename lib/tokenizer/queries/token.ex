@@ -82,6 +82,8 @@ defmodule Tokenizer.Queries.Token do
     |> preload(:token)
   end
 
-  def set_all_tokens_available() do
+  def find_token_by_pokemon_name(pokemon) do
+    Token
+    |> where(name: ^pokemon)
   end
 end

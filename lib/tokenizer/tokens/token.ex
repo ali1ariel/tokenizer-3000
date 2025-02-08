@@ -1,5 +1,5 @@
 defmodule Tokenizer.Tokens.Token do
-  alias Tokenizer.Tokens.Token
+  alias Tokenizer.Queries.Token, as: TokenQueries
   alias Tokenizer.Repo
   use Ecto.Schema
   import Ecto.Changeset
@@ -28,9 +28,10 @@ defmodule Tokenizer.Tokens.Token do
   end
 
   def choose_pokemon() do
-    pokemon = Faker.Pokemon.name()
+    pokemon =
+      Faker.Pokemon.name()
 
-    if !Repo.exists?(Token, name: pokemon) do
+    if Repo.exists?(TokenQueries.find_token_by_pokemon_name(pokemon)) do
       choose_pokemon()
     else
       pokemon
