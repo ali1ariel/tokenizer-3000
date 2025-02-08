@@ -1,4 +1,6 @@
 defmodule Tokenizer.Tokens.Token do
+  alias Tokenizer.Tokens.Token
+  alias Tokenizer.Repo
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -7,6 +9,7 @@ defmodule Tokenizer.Tokens.Token do
 
   schema "tokens" do
     field :available?, :boolean, default: true
+    field :name, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -15,6 +18,22 @@ defmodule Tokenizer.Tokens.Token do
   def changeset(token, attrs) do
     token
     |> cast(attrs, [:available?])
+    |> put_name()
     |> validate_required([:available?])
+  end
+
+  def put_name(changeset) do
+    changeset
+    |> put_change(:name, choose_pokemon())
+  end
+
+  def choose_pokemon() do
+    pokemon = Faker.Pokemon.name()
+
+    if !Repo.exists?(Token, name: pokemon) do
+      choose_pokemon()
+    else
+      pokemon
+    end
   end
 end
