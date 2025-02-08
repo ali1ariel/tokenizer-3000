@@ -131,7 +131,10 @@ defmodule Tokenizer.Tokens do
       ** (Ecto.NoResultsError)
 
   """
-  def get_token_assignment!(id), do: Repo.get!(TokenAssignment, id)
+  def get_token_assignment!(id),
+    do:
+      Repo.get!(TokenAssignment, id)
+      |> Repo.preload([:token, :user])
 
   @doc """
   Creates a token_assignment.
@@ -227,7 +230,10 @@ defmodule Tokenizer.Tokens do
       ** (Ecto.NoResultsError)
 
   """
-  def get_token_usage_history!(id), do: Repo.get!(TokenUsageHistory, id)
+  def get_token_usage_history!(id),
+    do:
+      Repo.get!(TokenUsageHistory, id)
+      |> Repo.preload([:token, :user])
 
   @doc """
   Creates a token_usage_history.

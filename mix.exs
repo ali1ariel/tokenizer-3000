@@ -9,7 +9,15 @@ defmodule Tokenizer.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.cobertura": :test
+      ]
     ]
   end
 
@@ -45,6 +53,7 @@ defmodule Tokenizer.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:timex, "~> 3.0"},
+      {:excoveralls, "~> 0.18", only: :test},
       {:faker, "~> 0.19.0-alpha.1"}
     ]
   end
