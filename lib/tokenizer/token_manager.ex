@@ -27,8 +27,11 @@ defmodule Tokenizer.TokenManager do
     Atribui um token à um usuário, criando um relacionamento por meio da tabela TokenAssignment, e setando o campo de disponibilidade no token.
   """
   def assign_token(%{id: user_id}) do
-    token = get_available_token()
+    token =
+      get_available_token()
+
     user = Users.get_user!(user_id)
+    timer = Application.get_env(:tokenizer, :release_timer, 120)
 
     with {:ok, token_assignment} <-
            Tokens.create_token_assignment(%{token_id: token.id, user_id: user.id}) do
@@ -37,7 +40,7 @@ defmodule Tokenizer.TokenManager do
       Process.send_after(
         Tokenizer.ExpirationWorker,
         {:expire_token, token.id},
-        :timer.minutes(2)
+        :timer.seconds(timer)
       )
 
       {:ok, token_assignment |> Repo.preload([:user, :token])}
@@ -89,7 +92,6 @@ defmodule Tokenizer.TokenManager do
   def set_all_tokens_available() do
     TokenQueries.list_active_tokens()
     |> Repo.all()
-    |> IO.inspect(label: "all")
     |> Stream.map(fn t -> release_token(t, :removed) end)
     |> Stream.run()
   end

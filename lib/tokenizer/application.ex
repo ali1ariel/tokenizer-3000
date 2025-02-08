@@ -3,20 +3,21 @@ defmodule Tokenizer.Application do
   # for more information on OTP Applications
   @moduledoc false
   use Application
+  @env Mix.env()
 
   @impl true
   def start(_type, _args) do
-    children = [
-      TokenizerWeb.Telemetry,
-      Tokenizer.Repo,
-      {DNSCluster, query: Application.get_env(:tokenizer, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Tokenizer.PubSub},
-      # Start a worker by calling: Tokenizer.Worker.start_link(arg)
-      # {Tokenizer.Worker, arg},
-      # Start to serve requests, typically the last entry
-      TokenizerWeb.Endpoint,
-      Tokenizer.ExpirationWorker
-    ]
+    children =
+      [
+        TokenizerWeb.Telemetry,
+        Tokenizer.Repo,
+        {DNSCluster, query: Application.get_env(:tokenizer, :dns_cluster_query) || :ignore},
+        {Phoenix.PubSub, name: Tokenizer.PubSub},
+        # Start a worker by calling: Tokenizer.Worker.start_link(arg)
+        # {Tokenizer.Worker, arg},
+        # Start to serve requests, typically the last entry
+        TokenizerWeb.Endpoint
+      ] ++ if @env != :test, do: [Tokenizer.ExpirationWorker], else: []
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

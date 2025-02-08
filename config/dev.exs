@@ -8,7 +8,8 @@ config :tokenizer, Tokenizer.Repo,
   database: "tokenizer_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  ownership_timeout: 60_000
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -63,3 +64,5 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :tokenizer, release_timer: 120
