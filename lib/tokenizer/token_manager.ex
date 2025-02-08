@@ -28,7 +28,7 @@ defmodule Tokenizer.TokenManager do
   """
   def assign_token(%{id: user_id}) do
     token =
-      get_available_token()
+      get_available_token() || release_oldest_and_get_token()
 
     user = Users.get_user!(user_id)
     timer = Application.get_env(:tokenizer, :release_timer, 120)
@@ -48,6 +48,18 @@ defmodule Tokenizer.TokenManager do
   rescue
     _ in NoResultsError -> {:error, :not_found}
     _ -> {:error, :not_available}
+  end
+
+  defp release_oldest_and_get_token do
+    case TokenQueries.oldest_active() |> Repo.one() do
+      nil ->
+        nil
+
+      assignment ->
+        token = Tokens.get_token!(assignment.token_id)
+        release_token(token, :replaced)
+        token
+    end
   end
 
   @doc """

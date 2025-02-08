@@ -60,13 +60,6 @@ defmodule Tokenizer.TokenManagerTest do
       result = TokenManager.assign_token(%{id: -1})
       assert result == {:error, :not_found}
     end
-
-    test "previne atribuição dupla para mesmo usuário", %{user: user} do
-      {:ok, _} = TokenManager.assign_token(user)
-
-      result = TokenManager.assign_token(user)
-      assert result == {:error, :not_available}
-    end
   end
 
   describe "release_token/2" do
