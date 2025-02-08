@@ -23,7 +23,6 @@ defmodule Tokenizer.Tokens.TokenAssignment do
     |> validate_required([:token_id, :user_id])
     |> foreign_key_constraint(:token_id)
     |> foreign_key_constraint(:user_id)
-    |> unique_constraint(:token_id, name: :unique_active_token_assignment)
     |> unique_constraint(:user_id, name: :unique_active_user_assignment)
   end
 
@@ -33,8 +32,10 @@ defmodule Tokenizer.Tokens.TokenAssignment do
   end
 
   defp define_expiration_time() do
+    release_timer = Application.get_env(:tokenizer, :release_timer, 120)
+
     DateTime.utc_now()
-    |> Timex.shift(minutes: 2)
+    |> Timex.shift(seconds: release_timer)
     |> DateTime.truncate(:second)
   end
 end

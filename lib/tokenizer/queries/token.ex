@@ -57,9 +57,9 @@ defmodule Tokenizer.Queries.Token do
   """
   def oldest_active do
     from(ta in TokenAssignment,
-      where: ta.expires_at > fragment("NOW()"),
       order_by: [asc: ta.inserted_at],
-      limit: 1
+      limit: 1,
+      preload: [:user, :token]
     )
   end
 
