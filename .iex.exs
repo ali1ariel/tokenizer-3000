@@ -7,3 +7,4 @@ alias Users.User
 alias Tokens.Token
 alias Tokens.TokenAssignment
 alias Tokens.TokenUsageHistory
+alias TokenizerSimulator, as: Simulator
