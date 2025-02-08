@@ -18,14 +18,17 @@ defmodule Tokenizer.Tokens.Token do
   def changeset(token, attrs) do
     token
     |> cast(attrs, [:available?])
-    |> put_name()
+    |> put_name(token.name)
     |> validate_required([:available?])
+    |> validate_tokens_limit()
   end
 
-  def put_name(changeset) do
+  def put_name(changeset, nil) do
     changeset
     |> put_change(:name, choose_pokemon())
   end
+
+  def put_name(changeset, _), do: changeset
 
   def choose_pokemon() do
     pokemon =
@@ -35,6 +38,16 @@ defmodule Tokenizer.Tokens.Token do
       choose_pokemon()
     else
       pokemon
+    end
+  end
+
+  defp validate_tokens_limit(changeset) do
+    case Repo.aggregate(__MODULE__, :count) do
+      count when count >= 100 ->
+        add_error(changeset, :base, "Limite máximo de 100 tokens atingido")
+
+      _ ->
+        changeset
     end
   end
 end
